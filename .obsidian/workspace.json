@@ -1,0 +1,200 @@
+{
+  "main": {
+    "id": "456b1ee057adea0c",
+    "type": "split",
+    "children": [
+      {
+        "id": "3eaaed7b505794be",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "a281591bda6c9889",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "云原生/云原生概念.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "47e208c45e3cd40e",
+    "type": "split",
+    "children": [
+      {
+        "id": "7d936a064cb0c1bc",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "12c27177d0a5afba",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "6718e8a228eff2ad",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "79ca1f98ef8f2cf8",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {}
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 699.5
+  },
+  "right": {
+    "id": "1f5cb8e2dda599ce",
+    "type": "split",
+    "children": [
+      {
+        "id": "30a439f6c71ce3f2",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "b6f2827c8f2dc530",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "云原生/云原生概念.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "3c82fa7496d1ab20",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              }
+            }
+          },
+          {
+            "id": "f641b5f714e73932",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "云原生/云原生概念.md"
+              }
+            }
+          },
+          {
+            "id": "d85157f98fd4acd5",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "云原生/云原生概念.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": false
+              }
+            }
+          }
+        ],
+        "currentTab": 3
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:打开快速切换": false,
+      "graph:查看关系图谱": false,
+      "canvas:新建白板": false,
+      "daily-notes:打开/创建今天的日记": false,
+      "templates:插入模板": false,
+      "command-palette:打开命令面板": false,
+      "markdown-importer:打开 Markdown 格式转换器": false
+    }
+  },
+  "active": "a281591bda6c9889",
+  "lastOpenFiles": [
+    "云原生/DevOps/DevOps概念.md",
+    "云原生/DevOps/Jenkins.md",
+    "云原生/DevOps",
+    "云原生/Docker/Dockerfile.md",
+    "云原生/Docker/Docker swarm（docker集群模式）.md",
+    "JUC/JUC基础部分.md",
+    "云原生/Docker",
+    "JUC/JUC高级/volatile解析.md",
+    "JUC/JUC高级/LockSupport和线程中断.md",
+    "JUC/JUC高级/原子操作类之18罗汉增强.md",
+    "JUC/JUC高级/AbstractQueuedSynchronizer.md",
+    "Redis/Redis6/Redis6.md",
+    "JUC/JUC高级",
+    "Redis/Redis6/redis经典五种数据类型及底层实现.md",
+    "Redis/Redis6/高性能设计之epoll和IO多路复用深度解析.md",
+    "MySQL/MySQL进阶/MySQL进阶.md",
+    "Redis/Redis6",
+    "MySQL/MySQL进阶/慢查询.md",
+    "MySQL/MySQL进阶/未来数据库.md",
+    "MySQL/MySQL进阶",
+    "MySQL/MySQL进阶/如何处理数据更新.md",
+    "MySQL/MYSQL基础.md",
+    "MySQL/MySQL进阶/ORM框架.md",
+    "MySQL/MySQL高级.md",
+    "MySQL/MySQL复制.md",
+    "MySQL/MyBatis.md",
+    "MySQL/MySQL进阶/数据库切换.md",
+    "MySQL/MySQL进阶/数据库扩容.md",
+    "MySQL/数据库切换_whDd8PSRCSabd3SvCkZAUP.md",
+    "MySQL/数据库扩容_iGXRiqNa8CUEc1wsEd1SPQ.md",
+    "MySQL/MySQL进阶/数据库备份.md",
+    "MySQL/image/image_zrfAX9xdXk.png",
+    "MySQL/image/image_lcxfwrUUzw.png",
+    "MySQL/image/image_iSfgyLA9Ll.png",
+    "MySQL/image/image_gvYK9uhOOy.png",
+    "MySQL/image/image_bgYiugsI_9.png",
+    "MySQL/image/image_YKoh01F3K-.png",
+    "MySQL/image/image_UsJ-k5GDoX.png",
+    "MySQL/image/image_Mf_yItFLVj.png",
+    "MySQL/image/image_LtSJyh9COa.png",
+    "MySQL/image/image_9mWAPzXDyt.png",
+    "MySQL/image",
+    "MySQL/未来数据库.zip",
+    "MySQL/未确认 490450.crdownload",
+    "MySQL/数据库切换.zip",
+    "MySQL/未确认 647600.crdownload",
+    "未命名.canvas"
+  ]
+}

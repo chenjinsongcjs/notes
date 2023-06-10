@@ -1,0 +1,258 @@
+# redis经典五种数据类型及底层实现
+
+## Redis源代码的核心实现
+
+![](image/image_D35acVgZKF.png)
+
+## 我么平时所说的Redis的KV键值对字典数据库是什么？
+
+-   Redis中的KV键值对中的Key，一般是一个字符串，value为Redis对象（RedisObject）
+
+![](image/image_3PBwuzPE6M.png)
+
+-   Redis源码分析参考
+
+<https://redissrc.readthedocs.io/en/latest/index.html>
+
+-   Redis定义了RedisObject来表示string、list、set、zset、hash等数据结构
+    -   **每一个KV键值对都是一个dictEntry**![](image/image_1l3uKC5rG4.png)
+-   RedisObject、Redis数据类型、Redis数据类型底层实现之间的关系
+
+    ![](image/image_dCIsxk9wkD.png)
+
+## 五大类型的底层C源码分析
+
+第1列
+
+set hello word为例，因为Redis是KV键值对的数据库，**每个键值对都会有一个dictEntry**(源码位置：dict.h)，里面指向了key和value的指针，next 指向下一个 dictEntry。
+key 是字符串，但是 Redis 没有直接使用 C 的字符数组，而是存储在redis自定义的 SDS中。
+value 既不是直接作为字符串存储，也不是直接存储在 SDS 中，而是存储在redisObject 中。
+实际上五种常用的数据类型的任何一种，都是通过 redisObject 来存储的。
+
+第2列
+
+![](image/image_04T1YPjFTB.png)
+
+-   查看key的类型
+    -   type key
+-   查看编码
+    -   object encoding xxx
+-   debug 结构(获取ReidsObject的内部信息)
+    -   debug object xxx
+    ```bash
+    Value at:0x7f34ad73e948 refcount:1 encoding:embstr serializedlength:3 lru:1704981 lru_seconds_idle:122
+    ```
+
+### RedisObject的作用
+
+第1列
+
+为了便于操作，**Redis采用redisObjec结构来统一五种不同的数据类型，** 这样所有的数据类型就都可以以相同的形式在函数间传递而不用使用特定的类型结构。同时，**为了识别不同的数据类型，redisObjec中定义了type和encoding字段对不同的数据类型加以区别**。
+
+第2列
+
+![](image/image_crPrNiuW-S.png)
+
+简单地说，redisObjec就是string、hash、list、set、zset的父类，可以在函数间传递时隐藏具体的类型信息，所以作者抽象了redisObjec结构来到达同样的目的。
+
+-   RedisObject的各个字段的含义
+
+    ![](image/image_HmLSBa4LJ7.png)
+
+### String数据结构介绍
+
+#### String的三大编码方式
+
+![](image/image__f_8X9lHcD.png)
+
+### 案例
+
+![](image/image_KZrfZ1j4CA.png)
+
+-   Redis没有使用C语言的字符数组作为字符串，自己定义了一个字符串结构—SDS（Simple Dynamic String）
+-   在Redis数据库里，包含字符串值的键值对都是由SDS实现的(Redis中所有的键都是由字符串对象实现的即底层是由SDS实现，Redis中所有的值对象中包含的字符串对象底层也是由SDS实现)。
+
+#### SDS（简单动态字符串）
+
+第1列
+
+![](image/image_l9SJ_RzhjC.png)
+
+第2列
+
+![](image/image_7v7g4smLMa.png)
+
+```java
+Redis中字符串的实现,SDS有多种结构（sds.h）：
+sdshdr5、(2^5=32byte)
+sdshdr8、(2 ^ 8=256byte)
+sdshdr16、(2 ^ 16=65536byte=64KB)
+sdshdr32、 (2 ^ 32byte=4GB)
+sdshdr64，2的64次方byte＝17179869184G用于存储不同的长度的字符串。
+ 
+len 表示 SDS 的长度，使我们在获取字符串长度的时候可以在 O(1)情况下拿到，而不是像 C 那样需要遍历一遍字符串。
+ 
+alloc 可以用来计算 free 就是字符串已经分配的未使用的空间，有了这个值就可以引入预分配空间的算法了，而不用去考虑内存分配的问题。
+ 
+buf 表示字符串数组，真存数据的。
+```
+
+-   Redis问什么要重新设计一个SDS数据结构
+
+    ![](image/image_3ZrDGrPtE9.png)
+
+![](image/image_kx1BWTPqul.png)
+
+### 结论
+
+-   只有整数才会使用 int，如果是浮点数， Redis 内部其实先将浮点数转化为字符串值，然后再保存。
+-   embstr 与 raw 类型底层的数据结构其实都是 SDS (简单动态字符串，Redis 内部定义 sdshdr 一种结构)
+
+![](image/image_F0mSgnkI8k.png)
+
+![](image/image_v6zRM8WCFt.png)
+
+-   Redis内部会根据用户给的不同键值而使用不同的编码格式，自适应地选择较优化的内部编码格式，而这一切对用户完全透明!
+
+### Hash类型
+
+第1列
+
+**hash-max-ziplist-entries：使用压缩列表保存时哈希集合中的最大元素个数。**
+
+**hash-max-ziplist-value：使用压缩列表保存时哈希集合中单个元素的最大长度。**
+
+Hash类型键的字段个数 **小于** hash-max-ziplist-entries 并且每个字段名和字段值的长度 **小于** hash-max-ziplist-value 时，Redis才会使用 OBJ\_ENCODING\_ZIPLIST来存储该键，前述条件任意一个不满足则会转换为 OBJ\_ENCODING\_HT的编码方式
+
+第2列
+
+![](image/image_VkahGpHTQH.png)
+
+-   哈希对象保存的键值对数量小于 512 个；所有的键值对的健和值的字符串长度都小于等于 64byte（一个英文字母一个字节） 时用ziplist，反之用hashtable
+-   一旦从压缩列表转为了哈希表，Hash类型就会一直用哈希表进行保存而不会再转回压缩列表了。在节省内存空间方面哈希表就没有压缩列表高效了。
+-   hash的两种编码方式
+    -   ziplist
+    -   hashtable
+
+#### ziplist结构
+
+-   ziplist是一种特殊的双向链表，它不存储指向上一个节点和下一个节点的指针，而是存储上一个节点的长度和当前节点的长度，通过牺牲一定的读写性能换取高效的内存利用，节约内存，使用中时间换空间的思想，只用在字段少，字段长度小的场景下。
+
+![](image/image_1rX4OBUv2g.png)
+
+![](image/image_tor1hH2q_H.png)
+
+-   明明有链表了，为什么出来一个压缩链表?
+    -   普通的链表需要存储指向上下节点的指针，而当存储的数据量小的时候，指针占有的内存空间，比数据占有的内存空间还大，是得不偿失的
+    -   普通的链表在内存中一般是不连续的访问速度相对较慢，ziplist就能很好的解决这个问题，通过上一个节点的长度和当前节点的长度进行上下访问
+    -   ziplist中直接存储了链表的长度，获取链表长度是不用遍历整个链表。
+-   ziplist的遍历是从尾部向头部遍历的，只要减去当前节点的长度就能找到前一个节点。
+
+### 在 Redis 中，hashtable 被称为字典（dictionary），它是一个数组+链表的结构
+
+### list类型
+
+![](image/image_2nW2rbvthG.png)
+
+```java
+(1) ziplist压缩配置：list-compress-depth 0
+      表示一个quicklist两端不被压缩的节点个数。这里的节点是指quicklist双向链表的节点，而不是指ziplist里面的数据项个数
+参数list-compress-depth的取值含义如下：
+0: 是个特殊值，表示都不压缩。这是Redis的默认值。
+1: 表示quicklist两端各有1个节点不压缩，中间的节点压缩。
+2: 表示quicklist两端各有2个节点不压缩，中间的节点压缩。
+3: 表示quicklist两端各有3个节点不压缩，中间的节点压缩。
+依此类推…
+ 
+(2) ziplist中entry配置：list-max-ziplist-size -2
+   当取正值的时候，表示按照数据项个数来限定每个quicklist节点上的ziplist长度。比如，当这个参数配置成5的时候，表示每个quicklist节点的ziplist最多包含5个数据项。当取负值的时候，表示按照占用字节数来限定每个quicklist节点上的ziplist长度。这时，它只能取-1到-5这五个值，
+每个值含义如下：
+-5: 每个quicklist节点上的ziplist大小不能超过64 Kb。（注：1kb => 1024 bytes）
+-4: 每个quicklist节点上的ziplist大小不能超过32 Kb。
+-3: 每个quicklist节点上的ziplist大小不能超过16 Kb。
+-2: 每个quicklist节点上的ziplist大小不能超过8 Kb。（-2是Redis给出的默认值）
+-1: 每个quicklist节点上的ziplist大小不能超过4 Kb。
+
+```
+
+-   list的编码方式
+    -   list用quicklist来存储，quicklist是一个双向链表，每个quicklist节点都是一个ziplist
+        ![](image/image_facwe6Yq2S.png)
+
+> 在低版本的Redis中，list采用的底层数据结构是ziplist+linkedList；
+> 高版本的Redis中底层数据结构是quicklist(它替换了ziplist+linkedList)，而quicklist也用到了ziplist
+
+### set类型
+
+第1列
+
+Redis用intset或hashtable存储set。如果元素都是整数类型，就用intset存储。
+如果不是整数类型，就用hashtable（数组+链表的存来储结构）。key就是元素的值，value为null。
+
+第2列
+
+![](image/image_x3Nqbs2yW_.png)
+
+### zset类型
+
+第1列
+
+当有序集合中包含的元素数量超过服务器属性 server.zset\_max\_ziplist\_entries 的值（默认值为 128 ），
+或者有序集合中新添加元素的 member 的长度大于服务器属性 server.zset\_max\_ziplist\_value 的值（默认值为 64 ）时，
+redis会使用跳跃表作为有序集合的底层实现。
+否则会使用ziplist作为有序集合的底层实现
+
+第2列
+
+![](image/image_jca3cZwJow.png)
+
+![](image/image_-bLsZWzUb_.png)
+
+-   skiplist是什么
+    -   跳表是能够进行二分查找的有序链表，是一种空间换时间的结构
+    -   跳表=链表+多级索引
+    -   由于链表，无法进行二分查找，因此借鉴数据库索引的思想，提取出链表中关键节点（索引），先在关键节点上查找，再进入下层链表查找。提取多层关键节点，就形成了跳跃表
+    -   时间复杂度是O(logN)，空间复杂度是O(N)
+        ![](image/image_kqoX5K6APJ.png)
+-   优缺点
+    -   优点：查找速度快
+    -   缺点：
+        -   跳跃表是一种典型的空间换时间的思想，在数据量较大，以及读多写少的场景下才能体现优势，比较有局限性
+        -   维护成本高，新增和删除都要重新将所有更新一遍，而且更新时间复杂读是O(n)的
+
+### 小结
+
+![](image/image_3KTPV_FOBN.png)
+
+```java
+ 
+1. 字符串
+int:8个字节的长整型。
+embstr:小于等于44个字节的字符串。
+raw:大于44个字节的字符串。
+Redis会根据当前值的类型和长度决定使用哪种内部编码实现。
+ 
+2. 哈希
+ziplist(压缩列表):当哈希类型元素个数小于hash-max-ziplist-entries 配置(默认512个)、同时所有值都小于hash-max-ziplist-value配置(默认64 字节)时，
+Redis会使用ziplist作为哈希的内部实现，ziplist使用更加紧凑的 结构实现多个元素的连续存储，所以在节省内存方面比hashtable更加优秀。
+hashtable(哈希表):当哈希类型无法满足ziplist的条件时，Redis会使 用hashtable作为哈希的内部实现，因为此时ziplist的读写效率会下降，而hashtable的读写时间复杂度为O(1)。
+ 
+3. 列表
+ziplist(压缩列表):当列表的元素个数小于list-max-ziplist-entries配置 (默认512个)，同时列表中每个元素的值都小于list-max-ziplist-value配置时 (默认64字节)，
+Redis会选用ziplist来作为列表的内部实现来减少内存的使 用。
+linkedlist(链表):当列表类型无法满足ziplist的条件时，Redis会使用 linkedlist作为列表的内部实现。quicklist  ziplist和linkedlist的结合以ziplist为节点的链表(linkedlist)
+ 
+4. 集合
+intset(整数集合):当集合中的元素都是整数且元素个数小于set-max- intset-entries配置(默认512个)时，Redis会选用intset来作为集合的内部实现，从而减少内存的使用。
+hashtable(哈希表):当集合类型无法满足intset的条件时，Redis会使用hashtable作为集合的内部实现。
+ 
+5. 有序集合
+ziplist(压缩列表):当有序集合的元素个数小于zset-max-ziplist- entries配置(默认128个)，同时每个元素的值都小于zset-max-ziplist-value配 置(默认64字节)时，
+Redis会用ziplist来作为有序集合的内部实现，ziplist 可以有效减少内存的使用。
+skiplist(跳跃表):当ziplist条件不满足时，有序集合会使用skiplist作 为内部实现，因为此时ziplist的读写效率会下降。
+
+```
+
+-   各个算法时间复杂度
+
+![](image/image_BkQmup37lT.png)

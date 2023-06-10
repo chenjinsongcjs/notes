@@ -1,0 +1,338 @@
+# Java锁系列
+
+# 乐观锁和悲观锁
+
+### 悲观锁
+
+-   认为自己在使用数据的时候一定会有其他线程来修改数据，因此在使用数据时会**先加锁**，确保数据不会被其他线程修改
+-   synchronized和Lock的实现类都是悲观锁
+-   悲观锁适合在写操作多的场景下使用，先加锁可以确保写操作的正确性
+
+```java
+//悲观锁的伪代码示例
+//synchronized 加锁
+public synchronized void m1(){
+  //操作共享资源
+}
+//Lock实现类加锁
+public void m2(){
+  ReentrantLock lock = new RenetrantLock();
+  lock.lock()//加锁
+  try{
+    //操作资源类
+  }finally{
+    lock.unlock();//释放锁
+  }
+}
+```
+
+## 乐观锁
+
+-   认为自己在操作数据的时候不会有其它线程来修改数据，所以**不会加锁**，只有在修改数据的时候会判断是否有其他的线程修改过数据。
+-   如果要访问的数据没有被其他线程修改过，那么就去修改这个数据，如果这个给数据被其他线程修改过，那么就根据乐观锁的实现方法去操作这个数据。
+-   乐观锁在Java中是通过使用无锁编程来实现，最常采用的是**CAS算法**，Java原子类中的递增操作就通过CAS自旋实现的。
+-   乐观锁适合在读操作多的场景，不加锁的特点可以大幅度的提高读操作的性能
+-   乐观锁一般有两种实现方式：
+    -   采用版本号机制
+    -   采用CAS算法
+
+# 锁相关的八种案例演示
+
+### synchronized的三种应用方式
+
+synchronized的锁对象
+
+-   作用于实例方法，对当前实例加锁，访问实例的同步方法需要获取当前实例锁
+-   作用于同步代码块，需要获取同步代码块的当前锁对象
+-   作用域静态方法，当前类对象加锁，方法静态同步方法，需要获取当前类锁
+
+JDK源码解释，notify的三种使用场景
+
+![](image/image_IfeOttaFnB.png)
+
+### 从字节码的角度分析synchronized实现
+
+-   解析字节码文件获取字节码指令的详细信息：javap  -c xxx.class
+    -   显示详细信息使用：javap -v xxx.class
+
+#### synchronized同步代码块
+
+类
+
+```java
+public class Main {
+    private final Object lockObject = new Object();
+    public  void m() {
+        synchronized (lockObject){
+            System.out.println(lockObject);
+        }
+    }
+}
+```
+
+-   synchronized同步代码块是使用`monitorenter`和`monitorexit`实现的。
+-   一个`monitorenter`对应两个`monitorexit`，目的是为了保证在出现异常的时候，锁也能正常的释放，避免死锁出现
+
+反编译字节码指令 (javap - c  Main.class)
+
+```java
+ public void m();
+    Code:
+       0: aload_0
+       1: getfield      #3                  // Field lockObject:Ljava/lang/Object;
+       4: dup
+       5: astore_1
+       6: monitorenter
+       7: getstatic     #4                  // Field java/lang/System.out:Ljava/io/PrintStream;
+      10: aload_0
+      11: getfield      #3                  // Field lockObject:Ljava/lang/Object;
+      14: invokevirtual #5                  // Method java/io/PrintStream.println:(Ljava/lang/Object;)V
+      17: aload_1
+      18: monitorexit
+      19: goto          27
+      22: astore_2
+      23: aload_1
+      24: monitorexit
+      25: aload_2
+      26: athrow
+      27: return
+
+```
+
+#### synchronized普通同步方法
+
+第1列
+
+-   调用指令将会检查方法的`ACC_SYNCHRONIZED`访问标志是否被设置。
+-   如果设置了，执行线程会将先持有`monitor`然后再执行方法，
+-   最后在方法完成(无论是正常完成还是非正常完成)时释放 `monitor`
+
+第2列
+
+![](image/image_7PKRrdbBT6.png)
+
+#### synchronized静态同步方法
+
+第1列
+
+-   &#x20;`ACC_STATIC`, `ACC_SYNCHRONIZED`访问标志区分该方法是否静态同步方法
+
+第2列
+
+![](image/image_ffHyInt-E0.png)
+
+### synchronized锁的是什么
+
+-   synchronized锁的是monitor管程就是我们常说的锁，他是一个ObjectMonitor对象，是用c++实现的
+-   管程  monitor是什么
+    -   管程是一种程序结构，它可以保证多线程互斥访问共享资源
+    -   执行线程要求先成功持有管程，才能执行方法，最后当方法完成（无论时正常完成还是异常完成）时释放管程。在方法执行期间，执行线程持有管程其他线程无法再获取到同一个管程。
+    -   在Hotspot虚拟机中mintor采用ObjectMonitor实现，每个对象天生就带有一个monitor
+
+`ObjectMonitor.java→ObjectMonitor.cpp→objectMonitor.hpp`
+
+![](image/image_6YMCVs9VrK.png)
+
+ObjectMonitor中有几个关键属性
+
+`_owner`  指向持有ObjectMonitor对象的线程
+`_WaitSet ` 存放处于wait状态的线程队列
+`_EntryList `存放处于等待锁block状态的线程队列
+`_recursions`  锁的重入次数
+`_count  `用来记录该线程获取锁的次数
+
+-   **synchronized的monitorenter和monitorexit的底层执行原理？**
+    -   见下可重入锁实现机理
+
+### 八锁现象
+
+-   主要区分清楚是否是同一把锁，同一把锁就会阻塞，不是同步方法不会受到影响
+-   对象锁
+-   类锁
+
+# 公平锁和非公平锁（AQS详细说明）
+
+-   公平锁顾名思义，就是每个线程获取锁要进行排队，在获取锁之前都要判断前面是否还有线程没有获取锁
+-   非公平锁：可以抢占CLH队列中等待线程的锁（AQS详解）
+-   synchronized和Lock的实现类默认都是非公平锁，效率较高
+-   Lock的实现类可以切换为公平锁，synchronized则只能是非公平锁
+-   公平锁会出现锁饥饿的现象
+-   高吞吐量建议使用非公平锁
+
+# 可重入锁（递归锁）
+
+-   可重入锁指的是：当同一个线程在外层方法获取锁，当进入方法需要获取同一个锁的时候会自动获取锁。不会因为自己持有锁需要再次获取锁而阻塞。
+-   synchronized和Lock锁的实现类都是可重入锁，在一定程度上避免了死锁
+-   隐式可重入锁synchronized
+    -   在一个synchronized修饰的方法或代码块的内部调用本类的其他synchronized修饰的方法或代码块时，是永远可以得到锁的
+    ```java
+    //同步代码块
+    public static void main(String[] args)
+        {
+            final Object objectLockA = new Object();
+
+            new Thread(() -> {
+                synchronized (objectLockA)
+                {
+                    System.out.println("-----外层调用");
+                    synchronized (objectLockA)
+                    {
+                        System.out.println("-----中层调用");
+                        synchronized (objectLockA)
+                        {
+                            System.out.println("-----内层调用");
+                        }
+                    }
+                }
+            },"a").start();
+        }
+
+
+    //同步方法
+    public class ReEntryLockDemo
+    {
+        public synchronized void m1()
+        {
+            System.out.println("-----m1");
+            m2();
+        }
+        public synchronized void m2()
+        {
+            System.out.println("-----m2");
+            m3();
+        }
+        public synchronized void m3()
+        {
+            System.out.println("-----m3");
+        }
+
+        public static void main(String[] args)
+        {
+            ReEntryLockDemo reEntryLockDemo = new ReEntryLockDemo();
+
+            reEntryLockDemo.m1();
+        }
+    }
+
+
+    ```
+    -   与可重入锁相反，不可重入锁不可递归调用，递归调用就发生**死锁**。
+    -   **synchronized可重入锁的实现机理**
+        -   每个锁对象拥有一个锁计数器和一个指向持有该锁的线程的指针。
+        -   当执行monitorenter时，如果目标锁对象的计数器为零，那么说明它没有被其他线程所持有，Java虚拟机会将该锁对象的持有线程设置为当前线程，并且将其计数器加1。
+        -   在目标锁对象的计数器不为零的情况下，如果锁对象的持有线程是当前线程，那么 Java 虚拟机可以将其计数器加1，否则需要等待，直至持有线程释放该锁。
+        -   当执行monitorexit时，Java虚拟机则需将锁对象的计数器减1。计数器为零代表锁已被释放。
+    -   为什么每个对象都可以作为锁对象：因为每个对象都对应一个ObjectMonitor对象，这个对象就是锁对象
+-   显示可重入锁Lock锁的实现类
+    ```java
+
+    public class ReEntryLockDemo
+    {
+        static Lock lock = new ReentrantLock();
+
+        public static void main(String[] args)
+        {
+            new Thread(() -> {
+                lock.lock();
+                try
+                {
+                    System.out.println("----外层调用lock");
+                    lock.lock();
+                    try
+                    {
+                        System.out.println("----内层调用lock");
+                    }finally {
+                        // 这里故意注释，实现加锁次数和释放次数不一样
+                        // 由于加锁次数和释放次数不一样，第二个线程始终无法获取到锁，导致一直在等待。
+                        lock.unlock(); // 正常情况，加锁几次就要解锁几次
+                    }
+                }finally {
+                    lock.unlock();
+                }
+            },"a").start();
+
+            new Thread(() -> {
+                lock.lock();
+                try
+                {
+                    System.out.println("b thread----外层调用lock");
+                }finally {
+                    lock.unlock();
+                }
+            },"b").start();
+
+        }
+    }
+     
+     
+
+    ```
+
+# 死锁及排查
+
+第1列
+
+-   死锁：指的是两个及其以上的线程在执行的过程中相互竞争资源而导致相互等待的现象，如果没有外力干预他们将无法推进下去。
+
+第2列
+
+![](image/image_y42kZ-17vw.png)
+
+-   造成死锁的原因：
+    -   系统资源不足
+    -   线程运行推进的顺序不对
+    -   资源分配不当
+-   死锁Demo
+    ```java
+    package com.xyz;
+
+    import java.util.concurrent.TimeUnit;
+
+    public class Main {
+        private static final Object lockA = new Object();
+        private static final Object lockB = new Object();
+        public static void main(String[] args) {
+            new Thread(()->{
+                synchronized (lockA){
+                    System.out.println(Thread.currentThread().getName()+" 持有锁lockA,想要获取lockB");
+                    try {
+                        TimeUnit.SECONDS.sleep(2);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    synchronized (lockB){
+                        System.out.println(Thread.currentThread().getName()+" 持有lockAB");
+                    }
+                }
+            },"t1").start();
+
+            new Thread(()->{
+                synchronized (lockB){
+                    System.out.println(Thread.currentThread().getName()+" 持有锁lockB,想要获取lockA");
+                    try {
+                        TimeUnit.SECONDS.sleep(2);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    synchronized (lockA){
+                        System.out.println(Thread.currentThread().getName()+" 持有lockAB");
+                    }
+                }
+            },"t2").start();
+        }
+    }
+
+    ```
+-   排查死锁
+    1.  jps 获取当前运行中的java程序的进程id
+    2.  jstack pid  查看堆栈信息，
+
+# 读写锁
+
+# 自旋锁spinlock
+
+# 无锁→独占锁→读写锁→邮戳锁
+
+# 无锁→偏向锁→轻量级锁→重量级锁
+
+不可以String同一把锁。

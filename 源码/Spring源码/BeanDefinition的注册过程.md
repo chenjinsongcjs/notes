@@ -1,0 +1,218 @@
+# BeanDefinition的注册过程
+
+## 1. 创建IOC容器
+
+```java
+ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("bean.xml");
+
+```
+
+## 2. 调用构造器创建容器
+
+```java
+public ClassPathXmlApplicationContext(String configLocation) throws BeansException {
+    this(new String[] {configLocation}, true, null);
+ }
+```
+
+## 3. 刷新容器
+
+```java
+if (refresh) {
+      refresh();
+}
+
+```
+
+```java
+public void refresh() throws BeansException, IllegalStateException {
+    synchronized (this.startupShutdownMonitor) {
+      StartupStep contextRefresh = this.applicationStartup.start("spring.context.refresh");
+
+      // Prepare this context for refreshing.
+      prepareRefresh();
+
+      // Tell the subclass to refresh the internal bean factory.
+      ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
+
+      // Prepare the bean factory for use in this context.
+      prepareBeanFactory(beanFactory);
+
+      try {
+        // Allows post-processing of the bean factory in context subclasses.
+        postProcessBeanFactory(beanFactory);
+
+        StartupStep beanPostProcess = this.applicationStartup.start("spring.context.beans.post-process");
+        // Invoke factory processors registered as beans in the context.
+        invokeBeanFactoryPostProcessors(beanFactory);
+
+        // Register bean processors that intercept bean creation.
+        registerBeanPostProcessors(beanFactory);
+        beanPostProcess.end();
+
+        // Initialize message source for this context.
+        initMessageSource();
+
+        // Initialize event multicaster for this context.
+        initApplicationEventMulticaster();
+
+        // Initialize other special beans in specific context subclasses.
+        onRefresh();
+
+        // Check for listener beans and register them.
+        registerListeners();
+
+        // Instantiate all remaining (non-lazy-init) singletons.
+        finishBeanFactoryInitialization(beanFactory);
+
+        // Last step: publish corresponding event.
+        finishRefresh();
+      }
+
+      catch (BeansException ex) {
+        if (logger.isWarnEnabled()) {
+          logger.warn("Exception encountered during context initialization - " +
+              "cancelling refresh attempt: " + ex);
+        }
+
+        // Destroy already created singletons to avoid dangling resources.
+        destroyBeans();
+
+        // Reset 'active' flag.
+        cancelRefresh(ex);
+
+        // Propagate exception to caller.
+        throw ex;
+      }
+
+      finally {
+        // Reset common introspection caches in Spring's core, since we
+        // might not ever need metadata for singleton beans anymore...
+        resetCommonCaches();
+        contextRefresh.end();
+      }
+    }
+  }
+```
+
+## 4.告诉子类刷新内部bean工厂
+
+```java
+// Tell the subclass to refresh the internal bean factory.
+ ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
+ 
+ protected ConfigurableListableBeanFactory obtainFreshBeanFactory() {
+    refreshBeanFactory();
+    return getBeanFactory();
+ }
+```
+
+## 5.加载Bean的定义信息
+
+```java
+// Loads the bean definitions via an XmlBeanDefinitionReader.
+//通过XmlBeanDefinitionReader 加载bean的定义信息
+loadBeanDefinitions(beanFactory);
+```
+
+## 6.允许子类自定义reader 然后继续加载bean的定义信息
+
+```java
+// Allow a subclass to provide custom initialization of the reader,
+    // then proceed with actually loading the bean definitions.
+    initBeanDefinitionReader(beanDefinitionReader);
+    loadBeanDefinitions(beanDefinitionReader);
+```
+
+## 7.使用XmlBeanDefinitionReader 真正的加载bean定义信息
+
+```java
+reader.loadBeanDefinitions(configLocations); //configLocations 配置文件位置
+```
+
+## 8.加载各个配置文件的bean定义信息，并计数
+
+```java
+count += loadBeanDefinitions(location);
+```
+
+## 9.从指定位置加载bean的定义信息
+
+```java
+loadBeanDefinitions(location, null);
+```
+
+## 10.加载所有资源并计数
+
+```java
+count += loadBeanDefinitions(resource);
+```
+
+## 11.从指定的 XML 文件加载 bean 定义
+
+```java
+public int loadBeanDefinitions(Resource resource) throws BeanDefinitionStoreException {
+    return loadBeanDefinitions(new EncodedResource(resource));
+  }
+```
+
+## 12.实际上从指定的 XML 文件加载 bean 定义。
+
+```java
+doLoadBeanDefinitions
+```
+
+13.注册包含在给定 DOM 文档中的 bean 定义。 由loadBeanDefinitions调用。
+创建解析器类的新实例并在其上调用registerBeanDefinitions&#x20;
+---------------------------------------------
+
+```java
+int count = registerBeanDefinitions(doc, resource);
+```
+
+## 14.DOM解析
+
+```java
+parseBeanDefinitions(root, this.delegate);
+```
+
+## 15. 注册最终的装饰实例
+
+```java
+//将Beandefinition和beanName 包包在一起
+BeanDefinitionHolder bdHolder = delegate.parseBeanDefinitionElement(ele);
+// Register the final decorated instance.
+BeanDefinitionReaderUtils.registerBeanDefinition(bdHolder, getReaderContext().getRegistry());
+
+```
+
+## 16.注册Bean定义信息
+
+```java
+// Register bean definition under primary name.
+    String beanName = definitionHolder.getBeanName();
+    registry.registerBeanDefinition(beanName, definitionHolder.getBeanDefinition());
+```
+
+## 17.正在注册（DefaultListableBeanFactory）
+
+```java
+// Still in startup registration phase
+ this.beanDefinitionMap.put(beanName, beanDefinition);
+ this.beanDefinitionNames.add(beanName);
+```
+
+## 18.注册别名
+
+```java
+//Register aliases for bean name, if any.
+registry.registerAlias(beanName, alias);
+
+```
+
+![](image/image_5ZhTIgnis-.png)
+
+## 源码阅读方式
+
+-   对BeanDefinitionRegister的实现类的registerBeanDefinition打断点
+-   从后往前追踪函数调用栈
