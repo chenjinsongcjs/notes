@@ -4,5 +4,6 @@
   "showFrontmatter": false,
   "showLineNumber": false,
   "showIndentGuide": true,
-  "rightToLeft": false
+  "rightToLeft": false,
+  "alwaysUpdateLinks": true
 }

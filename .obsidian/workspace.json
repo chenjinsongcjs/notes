@@ -4,16 +4,16 @@
     "type": "split",
     "children": [
       {
-        "id": "3eaaed7b505794be",
+        "id": "2a9b5eb4ac4266af",
         "type": "tabs",
         "children": [
           {
-            "id": "a281591bda6c9889",
+            "id": "01ecfabfdac96c04",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "云原生/云原生概念.md",
+                "file": "Shell编程/7.for循环语句.md",
                 "mode": "source",
                 "source": false
               }
@@ -64,12 +64,20 @@
               "type": "bookmarks",
               "state": {}
             }
+          },
+          {
+            "id": "43b7cb246c56157d",
+            "type": "leaf",
+            "state": {
+              "type": "graph",
+              "state": {}
+            }
           }
         ]
       }
     ],
     "direction": "horizontal",
-    "width": 699.5
+    "width": 448.5
   },
   "right": {
     "id": "1f5cb8e2dda599ce",
@@ -85,7 +93,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "云原生/云原生概念.md",
+                "file": "Shell编程/7.for循环语句.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -108,7 +116,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "云原生/云原生概念.md"
+                "file": "Shell编程/7.for循环语句.md"
               }
             }
           },
@@ -118,13 +126,13 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "云原生/云原生概念.md",
+                "file": "Shell编程/7.for循环语句.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
                 "showSearch": false,
                 "searchQuery": "",
-                "backlinkCollapsed": false,
+                "backlinkCollapsed": true,
                 "unlinkedCollapsed": false
               }
             }
@@ -147,39 +155,39 @@
       "markdown-importer:打开 Markdown 格式转换器": false
     }
   },
-  "active": "a281591bda6c9889",
+  "active": "12c27177d0a5afba",
   "lastOpenFiles": [
-    "云原生/DevOps/DevOps概念.md",
-    "云原生/DevOps/Jenkins.md",
+    "未命名.canvas",
+    "Shell编程/7.for循环语句.md",
+    "Redis/Redis6/4.BloomFilter(布隆过滤器).md",
+    "Shell编程/for循环语句_wgrAX1NFPuJm8rxjDF8ESj.md",
+    "Netty/7.HTTP服务案例.md",
+    "Netty/1.Netty的介绍和应用场景.md",
+    "MySQL/MySQL进阶/8.未来数据库.md",
+    "Netty/Netty的介绍和应用场景 1.md",
+    "MySQL/MySQL进阶/7.数据库切换.md",
+    "MySQL/MySQL进阶/4.ORM框架.md",
+    "MySQL/MySQL进阶/6.数据库扩容.md",
+    "MySQL/MySQL进阶/3.如何处理数据更新.md",
+    "MySQL/MySQL进阶/1.MySQL进阶.md",
+    "JUC/JUC高级/7.CAS.md",
+    "JUC/JUC高级/3.Java锁系列.md",
+    "JUC/JUC高级/2.CompletableFuture.md",
+    "JUC/JUC高级/8.原子操作类之18罗汉增强.md",
+    "设计模式/1.设计模式.md",
+    "源码/SpringBoot源码/SpringBoot 源码.md",
+    "源码/Spring源码（新）/2.声明式事务.md",
+    "源码/Spring源码/7.Spring事件原理.md",
+    "源码/Spring源码/6.AOP原理.md",
+    "云原生/DevOps/1.DevOps概念.md",
+    "云原生/Docker/2.Docker命令.md",
+    "云原生/Docker/7.Docker swarm（docker集群模式）.md",
+    "云原生/云原生概念.md",
     "云原生/DevOps",
-    "云原生/Docker/Dockerfile.md",
-    "云原生/Docker/Docker swarm（docker集群模式）.md",
-    "JUC/JUC基础部分.md",
     "云原生/Docker",
-    "JUC/JUC高级/volatile解析.md",
-    "JUC/JUC高级/LockSupport和线程中断.md",
-    "JUC/JUC高级/原子操作类之18罗汉增强.md",
-    "JUC/JUC高级/AbstractQueuedSynchronizer.md",
-    "Redis/Redis6/Redis6.md",
     "JUC/JUC高级",
-    "Redis/Redis6/redis经典五种数据类型及底层实现.md",
-    "Redis/Redis6/高性能设计之epoll和IO多路复用深度解析.md",
-    "MySQL/MySQL进阶/MySQL进阶.md",
     "Redis/Redis6",
-    "MySQL/MySQL进阶/慢查询.md",
-    "MySQL/MySQL进阶/未来数据库.md",
     "MySQL/MySQL进阶",
-    "MySQL/MySQL进阶/如何处理数据更新.md",
-    "MySQL/MYSQL基础.md",
-    "MySQL/MySQL进阶/ORM框架.md",
-    "MySQL/MySQL高级.md",
-    "MySQL/MySQL复制.md",
-    "MySQL/MyBatis.md",
-    "MySQL/MySQL进阶/数据库切换.md",
-    "MySQL/MySQL进阶/数据库扩容.md",
-    "MySQL/数据库切换_whDd8PSRCSabd3SvCkZAUP.md",
-    "MySQL/数据库扩容_iGXRiqNa8CUEc1wsEd1SPQ.md",
-    "MySQL/MySQL进阶/数据库备份.md",
     "MySQL/image/image_zrfAX9xdXk.png",
     "MySQL/image/image_lcxfwrUUzw.png",
     "MySQL/image/image_iSfgyLA9Ll.png",
@@ -194,7 +202,6 @@
     "MySQL/未来数据库.zip",
     "MySQL/未确认 490450.crdownload",
     "MySQL/数据库切换.zip",
-    "MySQL/未确认 647600.crdownload",
-    "未命名.canvas"
+    "MySQL/未确认 647600.crdownload"
   ]
 }
