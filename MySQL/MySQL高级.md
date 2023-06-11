@@ -78,7 +78,6 @@ SQL语句在查询之前会使用查询优化器对查询进行优化。就是�
 
 -   ## SQL执行顺序
         ![](<https://cdn.nlark.com/yuque/0/2021/png/21698573/1626425424717-510168de-9561-4e21-9c28-47d93fb86d1c.png#height=163\&id=avYsh\&margin=\[object Object]\&name=image.png\&originHeight=326\&originWidth=373\&originalType=binary\&ratio=1\&size=40150\&status=done\&style=none\&width=186.5>)
-
         ![](<https://cdn.nlark.com/yuque/0/2021/png/21698573/1626425438191-e527a309-4fa0-47c3-9175-0ef8a90b04e1.png#height=119\&id=oRT9H\&margin=\[object Object]\&name=image.png\&originHeight=238\&originWidth=278\&originalType=binary\&ratio=1\&size=39685\&status=done\&style=none\&width=139>)
     \-
         ![](<https://cdn.nlark.com/yuque/0/2021/png/21698573/1626425446377-4b225cc9-aeb5-449e-b69e-05b7c1da089b.png#height=114\&id=pkIr2\&margin=\[object Object]\&name=image.png\&originHeight=228\&originWidth=799\&originalType=binary\&ratio=1\&size=55974\&status=done\&style=none\&width=399.5>)

@@ -11,8 +11,12 @@
             "id": "01ecfabfdac96c04",
             "type": "leaf",
             "state": {
-              "type": "graph",
-              "state": {}
+              "type": "markdown",
+              "state": {
+                "file": "MySQL/MySQL高级.md",
+                "mode": "source",
+                "source": false
+              }
             }
           }
         ]
@@ -89,6 +93,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
+                "file": "MySQL/MySQL高级.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -110,7 +115,9 @@
             "type": "leaf",
             "state": {
               "type": "outline",
-              "state": {}
+              "state": {
+                "file": "MySQL/MySQL高级.md"
+              }
             }
           },
           {
@@ -119,6 +126,7 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "MySQL/MySQL高级.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -150,6 +158,8 @@
   },
   "active": "01ecfabfdac96c04",
   "lastOpenFiles": [
+    "未命名.canvas",
+    "MySQL/MySQL高级.md",
     "MySQL/MySQL进阶/2.慢查询.md",
     "Redis/Redis6/9.Redis与MySQL数据双写一致性工程落地案例.md",
     "image/image_46ZkJh39PX.png.md",
@@ -190,12 +200,9 @@
     "Redis/Redis6/8.redis经典五种数据类型及底层实现.md",
     "image/image_D35acVgZKF.png.md",
     "Shell编程/7.for循环语句.md",
-    "未命名.canvas",
     "Redis/Redis6/4.BloomFilter(布隆过滤器).md",
     "Shell编程/for循环语句_wgrAX1NFPuJm8rxjDF8ESj.md",
     "Netty/7.HTTP服务案例.md",
-    "Netty/1.Netty的介绍和应用场景.md",
-    "MySQL/MySQL进阶/8.未来数据库.md",
     "云原生/DevOps"
   ]
 }
