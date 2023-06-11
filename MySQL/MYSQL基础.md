@@ -880,7 +880,7 @@ alter table 表 modify column 字段名 字段类型 约束
 
 1.  开启事务
     1.  set autocommit = 0;
-    2.  start transaction [[可以省略]]
+    2.  start transaction 可以省略
 2.  编写一组逻辑SQL语句
     1.  注意：SQL语句支持 insert、update、delete
     2.  设置回滚点：
